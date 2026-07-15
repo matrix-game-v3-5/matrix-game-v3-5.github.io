@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="description"
+    content="Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory</title>
+
+  <!-- FONTS & ICONS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg-soft: #f4f6f9;
+      --ink: #0F192B;
+      --ink-soft: #44566c;
+      --ink-faint: #8a99ab;
+      --line: #e5eaf1;
+      --line-strong: #d0d9e4;
+      --accent: #26456B;
+      --accent-2: #4A7FA8;
+      --accent-soft: #e9eff5;
+      --memory: #4A7FA8;
+      --current: #D9A441;
+      --radius: 14px;
+      --maxw: 900px;
+      --shadow-sm: 0 1px 2px rgba(15, 20, 30, .04), 0 1px 3px rgba(15, 20, 30, .06);
+      --shadow-md: 0 10px 30px -12px rgba(15, 20, 30, .18);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.65;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+    /* ── Nav ── */
+    nav.topbar {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: saturate(180%) blur(12px);
+      background: rgba(255, 255, 255, .72);
+      border-bottom: 1px solid var(--line);
+    }
+    nav.topbar .wrap {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 66px;
+    }
+    nav.topbar .brand {
+      font-weight: 700; font-size: .95rem; letter-spacing: -.01em; color: var(--ink);
+    }
+    nav.topbar .brand span { color: var(--accent); }
+    nav.topbar .nav-right { display: flex; align-items: center; gap: 26px; }
+    nav.topbar .nav-logo { height: 40px; width: auto; display: block; }
+    nav.topbar .links { display: flex; gap: 22px; }
+    nav.topbar .links a {
+      color: var(--ink-soft); font-size: .88rem; font-weight: 500;
+    }
+    nav.topbar .links a:hover { color: var(--ink); text-decoration: none; }
+    @media (max-width: 640px) { nav.topbar .links { display: none; } }
+
+    /* ── Hero ── */
+    header.hero {
+      position: relative;
+      padding: 84px 0 60px;
+      text-align: center;
+      overflow: hidden;
+      background:
+        radial-gradient(60% 60% at 50% 0%, rgba(38, 69, 107, .07), transparent 70%),
+        var(--bg);
+    }
+    header.hero::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: radial-gradient(70% 55% at 50% 0%, #000 0%, transparent 75%);
+      mask-image: radial-gradient(70% 55% at 50% 0%, #000 0%, transparent 75%);
+      opacity: .55; pointer-events: none;
+    }
+    header.hero .wrap { position: relative; z-index: 1; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: .78rem; font-weight: 600; letter-spacing: .02em;
+      color: var(--accent); background: var(--accent-soft);
+      border: 1px solid #cedbe8;
+      padding: 5px 13px; border-radius: 999px; margin-bottom: 22px;
+    }
+    .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+    h1.title {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
+      margin: 0 0 8px;
+    }
+    h1.title .accent { color: var(--accent); }
+    .subtitle {
+      font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+      color: var(--ink-soft); font-weight: 500; letter-spacing: -.01em;
+      max-width: 720px; margin: 0 auto 30px;
+    }
+
+    .authors {
+      font-size: 1rem; color: var(--ink); font-weight: 500;
+      max-width: 760px; margin: 0 auto 6px; line-height: 2;
+    }
+    .authors sup { color: var(--accent); font-weight: 700; }
+    .affil { color: var(--ink-soft); font-size: .95rem; font-style: italic; margin: 6px 0 4px; }
+    .notes { color: var(--ink-faint); font-size: .82rem; margin-bottom: 28px; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: .9rem; font-weight: 600;
+      padding: 10px 18px; border-radius: 999px;
+      border: 1px solid var(--ink); background: var(--ink); color: #fff;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .btn:hover { text-decoration: none; transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn.ghost { background: #fff; color: var(--ink); border-color: var(--line-strong); }
+    .btn.ghost:hover { border-color: var(--ink); }
+
+    /* ── Sections ── */
+    section { padding: 64px 0; }
+    section.alt { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+
+    .eyebrow {
+      text-align: center; font-size: .8rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent); margin: 0 0 8px;
+    }
+    h2.section-title {
+      text-align: center; font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+      font-weight: 800; letter-spacing: -.02em; margin: 0 0 10px;
+    }
+    .section-lead {
+      text-align: center; color: var(--ink-soft); max-width: 680px;
+      margin: 0 auto 40px; font-size: 1.02rem;
+    }
+
+    .prose p { color: var(--ink-soft); margin: 0 0 1rem; }
+    .prose strong { color: var(--ink); font-weight: 600; }
+
+    /* ── Teaser video ── */
+    .media-frame {
+      border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--line); box-shadow: var(--shadow-md);
+      background: #000; margin-top: 34px;
+    }
+    .media-frame video { width: 100%; display: block; aspect-ratio: 16/9; }
+
+    /* ── Method cards ── */
+    .method-card {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 28px; background: #fff; box-shadow: var(--shadow-sm);
+      margin-bottom: 22px;
+    }
+    .method-card h3 {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; margin: 0 0 12px;
+    }
+    .method-card h3 .num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+      background: var(--accent-soft); color: var(--accent);
+      font-size: .82rem; font-weight: 700;
+    }
+    .method-card figure { margin: 18px 0 0; }
+    .method-card img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); }
+    .method-card figcaption {
+      color: var(--ink-faint); font-size: .84rem; margin-top: 10px; text-align: center;
+    }
+    .method-card figcaption strong { color: var(--ink-soft); }
+
+    /* ── Video wall ── */
+    .video-scroll-container {
+      display: flex; overflow-x: auto; gap: 16px;
+      padding-bottom: 14px; margin-top: 24px;
+      scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+    }
+    .video-scroll-container::-webkit-scrollbar { height: 8px; }
+    .video-scroll-container::-webkit-scrollbar-track { background: transparent; }
+    .video-scroll-container::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
+    .video-scroll-container::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+
+    .video-card {
+      flex-shrink: 0; width: 300px; scroll-snap-align: start;
+      background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      overflow: hidden; cursor: pointer; box-shadow: var(--shadow-sm);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
+    .video-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md); border-color: var(--line-strong);
+    }
+    .video-card video { width: 100%; height: auto; display: block; background: #000; }
+
+    .subhead {
+      display: flex; align-items: center; gap: 9px;
+      font-size: 1.1rem; font-weight: 700; letter-spacing: -.01em;
+      margin: 34px 0 2px; text-align: left;
+    }
+    .subhead .tag {
+      font-size: .72rem; font-weight: 600; color: var(--ink-soft);
+      background: var(--bg-soft); border: 1px solid var(--line);
+      padding: 2px 9px; border-radius: 999px;
+    }
+    .subnote { text-align: left; color: var(--ink-faint); font-size: .88rem; margin: 4px 0 0; }
+
+    /* ── Frame strip panel ── */
+    .frame-strip-panel { background: #0b1220; padding: 8px; }
+    .frame-timeline { display: flex; gap: 3px; margin-bottom: 5px; }
+    .frame-timeline-item { flex: 1; position: relative; }
+    .frame-timeline-item img {
+      width: 100%; height: auto; display: block; border-radius: 3px;
+      border: 1.5px solid transparent;
+    }
+    .frame-timeline-item.is-memory img { border-color: var(--memory); }
+    .frame-timeline-item.is-current img { border-color: var(--current); }
+    .frame-timeline-item .ft-label {
+      position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; font-weight: 700; color: #fff;
+      text-shadow: 0 1px 3px #000; pointer-events: none;
+    }
+    .frame-compare { display: flex; gap: 5px; }
+    .frame-compare-item { flex: 1; }
+    .frame-compare-item img { width: 100%; height: auto; display: block; border-radius: 4px; }
+    .frame-compare-item .fc-label {
+      font-size: .62rem; font-weight: 600; text-align: center;
+      padding: 3px 0 1px; letter-spacing: .03em;
+    }
+    .fc-label.fc-memory { color: var(--memory); }
+    .fc-label.fc-current { color: var(--current); }
+
+    /* ── Citation ── */
+    .cite-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .cite-head h2 { margin: 0; text-align: left; }
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: .82rem; font-weight: 600; cursor: pointer;
+      padding: 7px 14px; border-radius: 999px;
+      border: 1px solid var(--line-strong); background: #fff; color: var(--ink);
+      transition: all .15s ease;
+    }
+    .copy-btn:hover { border-color: var(--ink); }
+    .copy-btn.done { background: #ecfdf5; border-color: #6ee7b7; color: #047857; }
+    pre.cite {
+      background: var(--bg-soft); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 20px; overflow-x: auto;
+      font-family: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, monospace;
+      font-size: .82rem; line-height: 1.7; color: var(--ink-soft); margin: 0;
+    }
+
+    .ack ul { color: var(--ink-soft); padding-left: 20px; }
+    .ack li { margin-bottom: 6px; }
+
+    footer.site {
+      padding: 40px 0; border-top: 1px solid var(--line);
+      text-align: center; color: var(--ink-faint); font-size: .88rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── NAV ── -->
+  <nav class="topbar">
+    <div class="wrap">
+      <div class="brand">Matrix-Game <span>3.5</span></div>
+      <div class="nav-right">
+        <div class="links">
+          <a href="#abstract">Abstract</a>
+          <a href="#method">Method</a>
+          <a href="#demos">Results</a>
+          <a href="#citation">Citation</a>
+        </div>
+        <img class="nav-logo" src="static/imgs/mg35/rd_logo.png" alt="Riemann Dynamics">
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <header class="hero">
+    <div class="wrap">
+      <span class="badge"><span class="dot"></span>720p · Real-Time · Streaming World Model</span>
+      <h1 class="title">Matrix-Game <span class="accent">3.5</span></h1>
+      <p class="subtitle">Enhancing Real-Time Streaming Interactive World Models with Patch Memory</p>
+
+      <div class="authors">
+        <span>XXX</span>
+      </div>
+      <p class="affil">Riemann Dynamics</p>
+      <p class="notes">
+        <sup>*</sup>Equal contribution.&nbsp;&nbsp;<sup>†</sup>Project lead.&nbsp;&nbsp;<sup>‡</sup>Corresponding author.
+      </p>
+
+      <div class="actions">
+        <a href="https://github.com/SkyworkAI/Matrix-Game/blob/main/Matrix-Game-3/assets/pdf/report.pdf" class="btn">
+          <i class="ai ai-arxiv"></i><span>Technical Report</span>
+        </a>
+        <a href="https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3" class="btn ghost">
+          <i class="fab fa-github"></i><span>GitHub</span>
+        </a>
+        <a href="https://huggingface.co/Skywork/Matrix-Game-3.0" class="btn ghost">
+          <span>🤗</span><span>HuggingFace</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── ABSTRACT ── -->
+  <section id="abstract">
+    <div class="wrap">
+      <p class="eyebrow">Overview</p>
+      <h2 class="section-title">Abstract</h2>
+      <div class="prose">
+        <p>
+          <strong>Matrix-Game 3.5</strong> extends Matrix-Game 3.0 toward geometry-aware, long-horizon interactive world
+          generation. The model organizes anchor frames, clean context frames, retrieved memory patches,
+          dynamic-subject references, and noisy target frames into a single <strong>pose-aware token sequence</strong>,
+          so camera control and memory conditioning are handled by the same self-attention stack. For camera control, we
+          adapt <strong>PRoPE</strong> to video generation by overlaying world-to-image projection geometry onto the
+          existing spatiotemporal RoPE channels, adding no learnable parameters while preserving RoPE's relative temporal
+          structure. For long-term scene memory, <strong>Mosaic Memory</strong> replaces frame-level recall with
+          patch-level memory: historical latent patches are lifted into metric 3D, reprojected to target views, selected
+          with visibility-aware fusion, and injected as target-aligned spatial conditioning. The memory system further
+          separates static scene recall from dynamic-subject consistency through a motion-aware object filter, static
+          Mosaic Memory, compact reference tokens, context masking, and an auxiliary subject loss. To provide the
+          required supervision, we build an offline annotation and curation pipeline that estimates metric depth, camera
+          poses, and intrinsics; generates window-level prompts for static scenes and dynamic objects; extracts object
+          tracks and reference images; and filters clips with multi-metric scene-quality criteria. Together, these
+          components enable long-horizon camera-controllable generation that recalls stable scene structure while
+          preserving prompt-driven dynamic content.
+        </p>
+      </div>
+
+      <div class="media-frame">
+        <video controls autoplay loop muted playsinline>
+          <source id="teaserSource" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── METHOD ── -->
+  <section id="method" class="alt">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2 class="section-title">Method</h2>
+      <p class="section-lead">
+        Matrix-Game 3.5 extends Matrix-Game 3.0 toward geometry-aware, long-horizon interactive world generation,
+        organizing all conditions into a single pose-aware token sequence so that camera control and memory are handled
+        by the same self-attention stack — through <strong>PRoPE</strong>-based camera control and patch-level
+        <strong>Mosaic Memory</strong>.
+      </p>
+
+      <div class="method-card">
+        <h3><span class="num">01</span>PRoPE Camera Control</h3>
+        <div class="prose" style="margin-bottom: .25rem;">
+          <p>
+            We build on <strong>PRoPE</strong>, which turns camera geometry into a relative position code: each latent
+            frame is associated with a full world-to-image projection matrix <em>P = lift(K)·W</em>. Unlike native PRoPE,
+            which allocates a separate subspace for the camera, our layout tiles the camera projection across all
+            head channels, on top of the full spatiotemporal RoPE including its frame axis. After the standard
+            RoPE rotation, queries are multiplied by <em>P</em> and keys and values by <em>P⁻¹</em>, so a single softmax
+            carries both the relative time <em>t = i − j</em> and the relative pose, adding no learnable
+            parameters.
+          </p>
+          <p>
+            For stability in low-precision training, all camera poses are recentered to the first target frame of the
+            generation window, with a direction-preserving logarithmic compression applied only to the metric-scale
+            translation.
+          </p>
+        </div>
+        <figure>
+          <img src="static/imgs/mg35/fig2_prope.jpg" alt="PRoPE injection into spatiotemporal RoPE">
+          <figcaption><strong>Figure 1:</strong> Injecting camera projection geometry into spatiotemporal RoPE.
+            (a) native PRoPE splits the head dimension into disjoint blocks; (b) our overlay tiles the camera projection
+            over all channels on top of the full spatiotemporal RoPE; (c) one attention link carries both relative time
+            and relative pose, with no learnable parameters.</figcaption>
+        </figure>
+      </div>
+
+      <div class="method-card">
+        <h3><span class="num">02</span>Mosaic Memory <span
+            style="font-weight:500; color:var(--ink-faint); font-size:.9rem;">&nbsp;· patch-level, static–dynamic decoupled</span>
+        </h3>
+        <div class="prose" style="margin-bottom: .25rem;">
+          <p>
+            Existing memory falls into <em>explicit</em> methods, which reconstruct scenes with geometric primitives, and
+            <em>implicit</em> methods, which store entire frames or latent features and rely on the network to learn
+            cross-view correspondence. <strong>Mosaic Memory</strong> adopts an intermediate granularity, storing
+            localized image <strong>patches</strong> as the fundamental unit of memory. For every latent patch in the
+            target frame, the corresponding memory is retrieved directly from camera geometry: historical patches are
+            back-projected into metric 3D using depth, intrinsics, and camera pose, then reprojected into the target
+            view.
+          </p>
+          <p>
+            When multiple historical patches project onto the same target location, a z-buffer selection
+            retains only the surface closest to the target camera; regions that are occluded, unreliable, or never
+            observed are left empty for the diffusion model to synthesize. Within the pose-aware sequence, each retrieved
+            patch takes the RoPE timestamp of the target frame it supports and the spatial coordinate at which its
+            content lands in the target view (Figure 2).
+          </p>
+          <figure style="margin: 6px 0 18px;">
+            <img src="static/imgs/mg35/fig3_sequence.jpg" alt="Pose-aware token sequence">
+            <figcaption><strong>Figure 2:</strong> The pose-aware token sequence. All token types share one timeline:
+              each carries its own RoPE time and, for camera-bearing blocks, its own camera. Memory patches reuse the
+              target camera and RoPE time on a parallel memory track, placed at projected spatial coordinates.
+            </figcaption>
+          </figure>
+          <p>
+            To preserve both scene-level stability and object-level consistency, the memory system decouples static and
+            dynamic content. A <strong>motion-aware object filter</strong> retains only static regions in Mosaic Memory
+            and masks moving ones before fusion, while the dynamic subject is represented by sequence-level
+            <strong>reference tokens</strong> encoded from a few reference images and reinforced by a subject-region
+            auxiliary loss — preserving identity while avoiding ghosting and duplication.
+          </p>
+        </div>
+        <figure>
+          <img src="static/imgs/mg35/fig4_memory.jpg" alt="Static-dynamic decoupled memory system">
+          <figcaption><strong>Figure 3:</strong> The static–dynamic decoupled memory system. A motion-aware object
+            filter separates static scene observations (fused into Mosaic Memory) from dynamic subjects (represented by
+            reference tokens); subject masks also drive context masking and an auxiliary training loss.</figcaption>
+        </figure>
+      </div>
+
+      <div class="method-card">
+        <h3><span class="num">03</span>Few-Step Distillation</h3>
+        <div class="prose" style="margin-bottom: .25rem;">
+          <p>
+            To turn the bidirectional video DiT into a real-time interactive world model, we reformulate generation as
+            <strong>chunk-wise autoregressive causal generation</strong>: each chunk attends only to past chunks through
+            a causal mask and to the mosaic memory available before it, preventing future-information leakage.
+          </p>
+          <p>
+            We adopt a three-stage pipeline — <strong>causal adaptation</strong>, <strong>consistency
+            distillation</strong>, and <strong>joint distillation</strong>. The first two stages use ground-truth history
+            under teacher forcing to adapt the base model to causal attention and compress it into a few-step generator;
+            joint distillation then combines a Distribution Matching Distillation (DMD) objective on autoregressive
+            rollouts with the consistency objective, yielding stable few-step generation over long horizons.
+          </p>
+        </div>
+        <figure>
+          <img src="static/imgs/mg35/fig5_distill.jpg" alt="Few-step distillation pipeline">
+          <figcaption><strong>Figure 4:</strong> The distillation pipeline. We adapt the bidirectional base model to
+            causal attention under teacher forcing, compress it into a few-step generator via consistency distillation,
+            and finally combine distribution matching with consistency for joint distillation under autoregressive
+            student rollouts.</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── RESULTS ── -->
+  <section id="demos">
+    <div class="wrap">
+      <p class="eyebrow">Results</p>
+      <h2 class="section-title">Quantitative Results</h2>
+      <p class="section-lead">
+        On our one-minute benchmark, Matrix-Game 3.5 achieves the best camera accuracy across all pose metrics and both
+        trajectory splits, while matching the strongest baselines on visual quality and revisit consistency at 720p.
+      </p>
+      <figure style="margin-top: 8px;">
+        <img src="static/imgs/mg35/table1_quant.jpg" alt="Quantitative comparison"
+          style="width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow-sm);">
+        <figcaption style="color: var(--ink-faint); font-size: .84rem; margin-top: 10px; text-align: center;">
+          <strong>Table 1:</strong> Quantitative comparison on our 1-min benchmark. Pose Acc. reports R (deg), T, and
+          CMC; VBench reports the Overall score; revisit consistency uses PSNR/SSIM/LPIPS on same-pose pairs; temporal
+          degradation compares imaging quality between the first and last 10-second windows. Green marks top-three
+          entries.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ── VISUALIZATION ── -->
+  <section class="alt">
+    <div class="wrap">
+      <p class="eyebrow">Visualization</p>
+      <h2 class="section-title">Qualitative Results</h2>
+      <p class="section-lead">
+        Long-horizon interactive rollouts under first- and third-person camera control. Drag horizontally to browse.
+      </p>
+
+      <div class="subhead">🎮 First-Person</div>
+      <div class="video-scroll-container" id="videoContainer_fp_r1"></div>
+      <div class="video-scroll-container" id="videoContainer_fp_r2"></div>
+
+      <div class="subhead" style="margin-top: 40px;">🎬 Third-Person</div>
+      <div class="video-scroll-container" id="videoContainer_tp_r1"></div>
+      <div class="video-scroll-container" id="videoContainer_tp_r2"></div>
+    </div>
+  </section>
+
+  <!-- ── ACK + CITATION ── -->
+  <section id="citation" class="alt">
+    <div class="wrap ack">
+      <h2 class="section-title" style="text-align:left;">Acknowledgement</h2>
+      <div class="prose">
+        <p>We would like to express our gratitude to:</p>
+        <ul>
+          <li><a href="https://github.com/huggingface/diffusers">Diffusers</a> for their excellent diffusion model
+            framework</li>
+          <li><a href="https://github.com/Wan-Video/Wan2.2">Wan2.2</a> for their strong base model</li>
+          <li><a href="https://github.com/guandeh17/Self-Forcing">Self-Forcing</a> for their excellent work on
+            autoregressive generation</li>
+          <li><a href="https://github.com/KwaiVGI/GameFactory">GameFactory</a> for their idea of action control module
+          </li>
+          <li><a href="https://github.com/SkyworkAI/LightX2V">LightX2V</a> for their efficient quantization and VAE
+            distillation techniques</li>
+        </ul>
+        <p>We are grateful to the broader research community for their open exploration and contributions to the field
+          of interactive world generation.</p>
+      </div>
+
+      <div class="cite-head" style="margin-top: 40px;">
+        <h2 class="section-title">Citation</h2>
+        <button id="copy-citation-btn" class="copy-btn" onclick="copyCitation()">
+          <i class="fas fa-copy"></i><span>Copy</span>
+        </button>
+      </div>
+      <pre class="cite"><code id="citation-content">@article{xxx2026matrix,
+  title={Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory},
+  author={XXX},
+  journal={arXiv preprint arXiv:2604.08995},
+  year={2026}
+}</code></pre>
+    </div>
+  </section>
+
+  <footer class="site">
+    <div class="wrap">Template adapted from <a href="https://nerfies.github.io/">NERFies</a>, CC BY-SA 4.0.</div>
+  </footer>
+
+  <!-- ── JS: Dynamic Video Loader ── -->
+  <script>
+    function createVideoCard(path) {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      const video = document.createElement('video');
+      video.controls = true;
+      video.preload = 'metadata';
+      const source = document.createElement('source');
+      source.src = path;
+      source.type = 'video/mp4';
+      video.appendChild(source);
+      video.addEventListener('dblclick', function () {
+        if (video.requestFullscreen) video.requestFullscreen();
+        else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      });
+      video.addEventListener('error', function () {
+        card.innerHTML = `<div style="padding:20px;text-align:center;color:#b91c1c;font-size:.85rem;"><strong>Video load failed</strong><br><small>${path}</small></div>`;
+      });
+      card.appendChild(video);
+      return card;
+    }
+
+    function videoPathToKey(path) {
+      const parts = path.split('/');
+      const folder = parts[parts.length - 2];
+      const file = parts[parts.length - 1].replace('.mp4', '');
+      if (folder === 'tp_demo') {
+        const m = file.match(/_([0-9]+)_action$/);
+        return m ? 'tp_' + m[1] : 'tp_' + file;
+      }
+      return folder + '_' + file;
+    }
+
+    function createFrameStripCard(path) {
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      const video = document.createElement('video');
+      video.controls = true;
+      video.preload = 'metadata';
+      const source = document.createElement('source');
+      source.src = path;
+      source.type = 'video/mp4';
+      video.appendChild(source);
+      video.addEventListener('dblclick', () => {
+        if (video.requestFullscreen) video.requestFullscreen();
+        else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+      });
+      video.addEventListener('error', () => {
+        card.innerHTML = `<div style="padding:12px;text-align:center;color:#b91c1c;font-size:.85rem;">Video load failed<br><small>${path}</small></div>`;
+      });
+      card.appendChild(video);
+
+      const key = videoPathToKey(path);
+      const base = 'static/imgs/memory_frames/' + key;
+
+      const panel = document.createElement('div');
+      panel.className = 'frame-strip-panel';
+      const timeline = document.createElement('div');
+      timeline.className = 'frame-timeline';
+      const N = 6;
+      for (let i = 0; i < N; i++) {
+        const item = document.createElement('div');
+        item.className = 'frame-timeline-item';
+        if (i <= 1) item.classList.add('is-memory');
+        if (i === N - 1) item.classList.add('is-current');
+        const img = new Image();
+        img.src = `${base}_strip_${i}.jpg`;
+        img.alt = `t${i}`;
+        img.title = i <= 1 ? '📌 Memory Frame' : (i === N - 1 ? '🎬 Current' : '');
+        item.appendChild(img);
+        const lbl = document.createElement('span');
+        lbl.className = 'ft-label';
+        lbl.textContent = i <= 1 ? '📌' : (i === N - 1 ? '🎬' : '');
+        item.appendChild(lbl);
+        timeline.appendChild(item);
+      }
+      panel.appendChild(timeline);
+
+      const compare = document.createElement('div');
+      compare.className = 'frame-compare';
+      ['early', 'late'].forEach((type, idx) => {
+        const item = document.createElement('div');
+        item.className = 'frame-compare-item';
+        const img = new Image();
+        img.src = `${base}_${type}.jpg`;
+        img.alt = type;
+        item.appendChild(img);
+        const lbl = document.createElement('div');
+        lbl.className = 'fc-label ' + (idx === 0 ? 'fc-memory' : 'fc-current');
+        lbl.textContent = idx === 0 ? '📌 Memory Ref' : '🎬 Late Scene';
+        item.appendChild(lbl);
+        compare.appendChild(item);
+      });
+      panel.appendChild(compare);
+
+      card.appendChild(panel);
+      return card;
+    }
+
+    // ── Media host ─────────────────────────────────────────────────────────────
+    // Videos are hosted externally (kept out of the git repo). Locally we load from
+    // ./static/videos so the preview works; in production set MEDIA_BASE below to the
+    // URL where you upload the mg35_1p / mg35_3p folders and teaser_mg35_2x3.mp4.
+    const IS_LOCAL = ['localhost', '127.0.0.1', ''].includes(location.hostname) || location.protocol === 'file:';
+    const MEDIA_BASE = IS_LOCAL
+      ? 'static/videos'
+      : 'https://REPLACE-WITH-YOUR-MEDIA-HOST/matrix-game-v3-5';   // ← set your external video host
+
+    // Point the teaser at the media host
+    (function () {
+      const ts = document.getElementById('teaserSource');
+      if (ts) { ts.src = MEDIA_BASE + '/teaser_mg35_2x3.mp4'; ts.parentElement.load(); }
+    })();
+
+    // Third-person videos (C:\Users\lijia\Downloads\3p → mg35_3p)
+    const videos_tp = [
+      'mg35_3p/tp_01.mp4', 'mg35_3p/tp_02.mp4', 'mg35_3p/tp_03.mp4', 'mg35_3p/tp_04.mp4', 'mg35_3p/tp_05.mp4',
+      'mg35_3p/tp_06.mp4', 'mg35_3p/tp_07.mp4', 'mg35_3p/tp_08.mp4', 'mg35_3p/tp_09.mp4', 'mg35_3p/tp_10.mp4',
+      'mg35_3p/tp_11.mp4', 'mg35_3p/tp_12.mp4', 'mg35_3p/tp_13.mp4', 'mg35_3p/tp_14.mp4', 'mg35_3p/tp_15.mp4'
+    ].map(p => MEDIA_BASE + '/' + p);
+
+    // First-person videos (C:\Users\lijia\Downloads\1p → mg35_1p)
+    const videos_fp = [
+      'mg35_1p/fp_01.mp4', 'mg35_1p/fp_02.mp4', 'mg35_1p/fp_03.mp4', 'mg35_1p/fp_04.mp4', 'mg35_1p/fp_05.mp4',
+      'mg35_1p/fp_06.mp4', 'mg35_1p/fp_07.mp4', 'mg35_1p/fp_08.mp4', 'mg35_1p/fp_09.mp4', 'mg35_1p/fp_10.mp4',
+      'mg35_1p/fp_11.mp4', 'mg35_1p/fp_12.mp4', 'mg35_1p/fp_13.mp4'
+    ].map(p => MEDIA_BASE + '/' + p);
+
+    // Split each into two rows (8 + 7)
+    const half_tp = Math.ceil(videos_tp.length / 2);
+    const videos_tp_r1 = videos_tp.slice(0, half_tp);
+    const videos_tp_r2 = videos_tp.slice(half_tp);
+
+    const half_fp = Math.ceil(videos_fp.length / 2);
+    const videos_fp_r1 = videos_fp.slice(0, half_fp);
+    const videos_fp_r2 = videos_fp.slice(half_fp);
+
+    function initVideoWall() {
+      const sections = [
+        { containerId: 'videoContainer_fp_r1', videos: videos_fp_r1 },
+        { containerId: 'videoContainer_fp_r2', videos: videos_fp_r2 },
+        { containerId: 'videoContainer_tp_r1', videos: videos_tp_r1 },
+        { containerId: 'videoContainer_tp_r2', videos: videos_tp_r2 }
+      ];
+
+      sections.forEach(section => {
+        const container = document.getElementById(section.containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        section.videos.forEach(path => {
+          const card = section.frameStrip ? createFrameStripCard(path) : createVideoCard(path);
+          container.appendChild(card);
+        });
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initVideoWall);
+
+    function copyCitation() {
+      const text = document.getElementById('citation-content').textContent;
+      const btn = document.getElementById('copy-citation-btn');
+      const label = btn.querySelector('span');
+      const done = () => {
+        label.textContent = 'Copied!';
+        btn.classList.add('done');
+        setTimeout(() => { label.textContent = 'Copy'; btn.classList.remove('done'); }, 2000);
+      };
+      navigator.clipboard.writeText(text).then(done).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text; document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta); done();
+      });
+    }
+  </script>
+</body>
+
+</html>
