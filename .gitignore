@@ -1,6 +1,3 @@
-# External-hosted media — uploaded to MEDIA_BASE, not committed to the repo
-static/videos/
-
 # Local dev tooling (static file server + PDF figure renderer)
 serve.ps1
 static/_pdfrender.html

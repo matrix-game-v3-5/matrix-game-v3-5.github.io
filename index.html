@@ -655,16 +655,11 @@
       return card;
     }
 
-    // ── Media host ─────────────────────────────────────────────────────────────
-    // Videos are hosted externally (kept out of the git repo). Locally we load from
-    // ./static/videos so the preview works; in production set MEDIA_BASE below to the
-    // URL where you upload the mg35_1p / mg35_3p folders and teaser_mg35_2x3.mp4.
-    const IS_LOCAL = ['localhost', '127.0.0.1', ''].includes(location.hostname) || location.protocol === 'file:';
-    const MEDIA_BASE = IS_LOCAL
-      ? 'static/videos'
-      : 'https://REPLACE-WITH-YOUR-MEDIA-HOST/matrix-game-v3-5';   // ← set your external video host
+    // ── Media base ─────────────────────────────────────────────────────────────
+    // Demo videos are compressed (H.264) and bundled in the repo under static/videos.
+    const MEDIA_BASE = 'static/videos';
 
-    // Point the teaser at the media host
+    // Point the teaser at the media base
     (function () {
       const ts = document.getElementById('teaserSource');
       if (ts) { ts.src = MEDIA_BASE + '/teaser_mg35_2x3.mp4'; ts.parentElement.load(); }
