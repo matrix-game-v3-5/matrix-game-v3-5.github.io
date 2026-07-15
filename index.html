@@ -30,7 +30,7 @@
       --memory: #4A7FA8;
       --current: #D9A441;
       --radius: 14px;
-      --maxw: 900px;
+      --maxw: 1040px;
       --shadow-sm: 0 1px 2px rgba(15, 20, 30, .04), 0 1px 3px rgba(15, 20, 30, .06);
       --shadow-md: 0 10px 30px -12px rgba(15, 20, 30, .18);
     }
@@ -54,6 +54,10 @@
     a:hover { text-decoration: underline; }
 
     .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+    /* Per-section widths: abstract stays narrow for reading; method & results run wider */
+    #abstract .wrap { max-width: 900px; }
+    #method .wrap { max-width: 1180px; }
+    #demos .wrap, #qualitative .wrap { max-width: 1120px; }
 
     /* ── Nav ── */
     nav.topbar {
@@ -155,7 +159,7 @@
       font-weight: 800; letter-spacing: -.02em; margin: 0 0 10px;
     }
     .section-lead {
-      text-align: center; color: var(--ink-soft); max-width: 680px;
+      text-align: center; color: var(--ink-soft); max-width: 900px;
       margin: 0 auto 40px; font-size: 1.02rem;
     }
 
@@ -166,7 +170,7 @@
     .media-frame {
       border-radius: var(--radius); overflow: hidden;
       border: 1px solid var(--line); box-shadow: var(--shadow-md);
-      background: #000; margin-top: 34px;
+      background: #000; margin: 34px auto 0; max-width: 900px;
     }
     .media-frame video { width: 100%; display: block; aspect-ratio: 16/9; }
 
@@ -187,7 +191,10 @@
       font-size: .82rem; font-weight: 700;
     }
     .method-card figure { margin: 18px 0 0; }
-    .method-card img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); }
+    .method-card img {
+      width: 100%; max-width: 780px; height: auto; display: block; margin: 0 auto;
+      border-radius: 10px; border: 1px solid var(--line);
+    }
     .method-card figcaption {
       color: var(--ink-faint); font-size: .84rem; margin-top: 10px; text-align: center;
     }
@@ -486,7 +493,7 @@
       </p>
       <figure style="margin-top: 8px;">
         <img src="static/imgs/mg35/table1_quant.jpg" alt="Quantitative comparison"
-          style="width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow-sm);">
+          style="width: 100%; max-width: 940px; height: auto; display: block; margin: 0 auto; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow-sm);">
         <figcaption style="color: var(--ink-faint); font-size: .84rem; margin-top: 10px; text-align: center;">
           <strong>Table 1:</strong> Quantitative comparison on our 1-min benchmark. Pose Acc. reports R (deg), T, and
           CMC; VBench reports the Overall score; revisit consistency uses PSNR/SSIM/LPIPS on same-pose pairs; temporal
@@ -497,7 +504,7 @@
   </section>
 
   <!-- ── VISUALIZATION ── -->
-  <section class="alt">
+  <section id="qualitative" class="alt">
     <div class="wrap">
       <p class="eyebrow">Visualization</p>
       <h2 class="section-title">Qualitative Results</h2>
