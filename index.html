@@ -181,22 +181,24 @@
       margin-bottom: 22px;
     }
     .method-card h3 {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 1.15rem; font-weight: 700; letter-spacing: -.01em; margin: 0 0 12px;
+      display: flex; align-items: center; gap: 11px;
+      font-size: 1.4rem; font-weight: 700; letter-spacing: -.01em; margin: 0 0 14px;
     }
     .method-card h3 .num {
       display: inline-flex; align-items: center; justify-content: center;
-      width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+      width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
       background: var(--accent-soft); color: var(--accent);
-      font-size: .82rem; font-weight: 700;
+      font-size: .9rem; font-weight: 700;
     }
+    .method-card .prose { padding: 0 18px; }
     .method-card figure { margin: 18px 0 0; }
     .method-card img {
       width: 100%; max-width: 780px; height: auto; display: block; margin: 0 auto;
       border-radius: 10px; border: 1px solid var(--line);
     }
     .method-card figcaption {
-      color: var(--ink-faint); font-size: .84rem; margin-top: 10px; text-align: center;
+      color: var(--ink-faint); font-size: .84rem; margin: 10px auto 0; text-align: center;
+      max-width: 780px;
     }
     .method-card figcaption strong { color: var(--ink-soft); }
 
@@ -396,11 +398,6 @@
             carries both the relative time <em>t = i − j</em> and the relative pose, adding no learnable
             parameters.
           </p>
-          <p>
-            For stability in low-precision training, all camera poses are recentered to the first target frame of the
-            generation window, with a direction-preserving logarithmic compression applied only to the metric-scale
-            translation.
-          </p>
         </div>
         <figure>
           <img src="static/imgs/mg35/fig2_prope.jpg" alt="PRoPE injection into spatiotemporal RoPE">
@@ -417,20 +414,14 @@
         </h3>
         <div class="prose" style="margin-bottom: .25rem;">
           <p>
-            Existing memory falls into <em>explicit</em> methods, which reconstruct scenes with geometric primitives, and
-            <em>implicit</em> methods, which store entire frames or latent features and rely on the network to learn
-            cross-view correspondence. <strong>Mosaic Memory</strong> adopts an intermediate granularity, storing
-            localized image <strong>patches</strong> as the fundamental unit of memory. For every latent patch in the
-            target frame, the corresponding memory is retrieved directly from camera geometry: historical patches are
-            back-projected into metric 3D using depth, intrinsics, and camera pose, then reprojected into the target
-            view.
-          </p>
-          <p>
-            When multiple historical patches project onto the same target location, a z-buffer selection
-            retains only the surface closest to the target camera; regions that are occluded, unreliable, or never
-            observed are left empty for the diffusion model to synthesize. Within the pose-aware sequence, each retrieved
-            patch takes the RoPE timestamp of the target frame it supports and the spatial coordinate at which its
-            content lands in the target view (Figure 2).
+            <strong>Mosaic Memory</strong> takes an intermediate granularity, using localized image
+            <strong>patches</strong> as the unit of memory. For each target latent patch, the corresponding memory is
+            retrieved directly from camera geometry — historical patches are back-projected into metric 3D from depth,
+            intrinsics, and pose, then reprojected into the target view. Where several patches land on the same location,
+            a z-buffer selection keeps only the surface closest to the target camera, while occluded, unreliable, or
+            unobserved regions are left empty for the diffusion model to synthesize. Within the pose-aware sequence, each
+            retrieved patch takes the RoPE timestamp of the target frame it supports and the spatial coordinate at which
+            its content lands in the target view (Figure 2).
           </p>
           <figure style="margin: 6px 0 18px;">
             <img src="static/imgs/mg35/fig3_sequence.jpg" alt="Pose-aware token sequence">
@@ -494,7 +485,7 @@
       <figure style="margin-top: 8px;">
         <img src="static/imgs/mg35/table1_quant.jpg" alt="Quantitative comparison"
           style="width: 100%; max-width: 940px; height: auto; display: block; margin: 0 auto; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow-sm);">
-        <figcaption style="color: var(--ink-faint); font-size: .84rem; margin-top: 10px; text-align: center;">
+        <figcaption style="color: var(--ink-faint); font-size: .84rem; margin: 10px auto 0; text-align: center; max-width: 940px;">
           <strong>Table 1:</strong> Quantitative comparison on our 1-min benchmark. Pose Acc. reports R (deg), T, and
           CMC; VBench reports the Overall score; revisit consistency uses PSNR/SSIM/LPIPS on same-pose pairs; temporal
           degradation compares imaging quality between the first and last 10-second windows. Green marks top-three
