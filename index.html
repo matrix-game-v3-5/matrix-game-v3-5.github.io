@@ -121,14 +121,14 @@
     }
     h1.title .accent { color: var(--accent); }
     .subtitle {
-      font-size: clamp(1.05rem, 2.4vw, 1.4rem);
+      font-size: clamp(1.02rem, 2.2vw, 1.32rem);
       color: var(--ink-soft); font-weight: 500; letter-spacing: -.01em;
-      max-width: 720px; margin: 0 auto 30px;
+      max-width: 960px; margin: 0 auto 16px;
     }
 
     .authors {
-      font-size: 1rem; color: var(--ink); font-weight: 500;
-      max-width: 760px; margin: 0 auto 6px; line-height: 2;
+      font-size: 1.16rem; color: var(--ink); font-weight: 600; letter-spacing: -.01em;
+      max-width: 760px; margin: 0 auto 4px; line-height: 1.6;
     }
     .authors sup { color: var(--accent); font-weight: 700; }
     .affil { color: var(--ink-soft); font-size: .95rem; font-style: italic; margin: 6px 0 4px; }
@@ -226,6 +226,17 @@
     }
     .video-card video { width: 100%; height: auto; display: block; background: #000; }
 
+    .cat-title {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 1.55rem; font-weight: 800; letter-spacing: -.02em; color: var(--ink);
+      margin: 52px 0 4px; padding-top: 30px; border-top: 1px solid var(--line-strong);
+    }
+    .cat-title::before {
+      content: ""; width: 4px; height: 1.15em; border-radius: 2px; background: var(--accent);
+    }
+    .cat-title:first-of-type { margin-top: 8px; padding-top: 0; border-top: none; }
+    .cat-title + .subhead { margin-top: 10px; }
+
     .subhead {
       display: flex; align-items: center; gap: 9px;
       font-size: 1.1rem; font-weight: 700; letter-spacing: -.01em;
@@ -318,11 +329,10 @@
       <p class="subtitle">Enhancing Real-Time Streaming Interactive World Models with Patch Memory</p>
 
       <div class="authors">
-        <span>XXX</span>
+        <span>Riemann Dynamics</span>
       </div>
-      <p class="affil">Riemann Dynamics</p>
-      <p class="notes">
-        <sup>*</sup>Equal contribution.&nbsp;&nbsp;<sup>†</sup>Project lead.&nbsp;&nbsp;<sup>‡</sup>Corresponding author.
+      <p class="affil" style="font-style: normal; margin-top: 6px;">
+        <a href="mailto:research@riemanndynamics.ai">research@riemanndynamics.ai</a>
       </p>
 
       <div class="actions">
@@ -500,9 +510,11 @@
       <p class="eyebrow">Visualization</p>
       <h2 class="section-title">Qualitative Results</h2>
       <p class="section-lead">
-        Long-horizon interactive rollouts under first- and third-person camera control. Drag horizontally to browse.
+        Long-horizon interactive rollouts. Drag horizontally to browse.
       </p>
 
+      <!-- Category 1: General Case -->
+      <h3 class="cat-title">General Case</h3>
       <div class="subhead">🎮 First-Person</div>
       <div class="video-scroll-container" id="videoContainer_fp_r1"></div>
       <div class="video-scroll-container" id="videoContainer_fp_r2"></div>
@@ -510,6 +522,24 @@
       <div class="subhead" style="margin-top: 40px;">🎬 Third-Person</div>
       <div class="video-scroll-container" id="videoContainer_tp_r1"></div>
       <div class="video-scroll-container" id="videoContainer_tp_r2"></div>
+
+      <!-- Category 2: Specific Capabilities -->
+      <h3 class="cat-title">Specific Capabilities</h3>
+
+      <div class="subhead">🧠 Long-Horizon Memory</div>
+      <p class="subnote">Revisiting earlier locations, the model recalls scene structure and appearance across large
+        viewpoint changes.</p>
+      <div class="video-scroll-container" id="videoContainer_mem"></div>
+
+      <div class="subhead" style="margin-top: 40px;">✍️ Promptable Generation</div>
+      <p class="subnote">Prompt-driven control over dynamic content within the interactive world.</p>
+      <div class="video-scroll-container" id="videoContainer_prompt"></div>
+
+      <div class="subhead" style="margin-top: 40px;">🧱 Collision Avoidance</div>
+      <p class="subnote">The generated world respects physical boundaries — the camera stops at obstacles rather than
+        passing through them.</p>
+      <div class="video-scroll-container" id="videoContainer_collision_r1"></div>
+      <div class="video-scroll-container" id="videoContainer_collision_r2"></div>
     </div>
   </section>
 
@@ -677,6 +707,22 @@
       'mg35_1p/fp_11.mp4', 'mg35_1p/fp_12.mp4', 'mg35_1p/fp_13.mp4'
     ].map(p => MEDIA_BASE + '/' + p);
 
+    // ── Specific capabilities ──
+    const videos_mem = [
+      'mg35_memory/mem_01.mp4', 'mg35_memory/mem_02.mp4', 'mg35_memory/mem_03.mp4', 'mg35_memory/mem_04.mp4',
+      'mg35_memory/mem_05.mp4', 'mg35_memory/mem_06.mp4', 'mg35_memory/mem_07.mp4'
+    ].map(p => MEDIA_BASE + '/' + p);
+
+    const videos_prompt = [
+      'mg35_promptable/pr_01.mp4', 'mg35_promptable/pr_02.mp4', 'mg35_promptable/pr_03.mp4', 'mg35_promptable/pr_04.mp4',
+      'mg35_promptable/pr_05.mp4', 'mg35_promptable/pr_06.mp4', 'mg35_promptable/pr_07.mp4'
+    ].map(p => MEDIA_BASE + '/' + p);
+
+    const videos_collision = [
+      'mg35_collision/col_01.mp4', 'mg35_collision/col_02.mp4', 'mg35_collision/col_03.mp4', 'mg35_collision/col_04.mp4',
+      'mg35_collision/col_05.mp4', 'mg35_collision/col_06.mp4', 'mg35_collision/col_07.mp4', 'mg35_collision/col_08.mp4'
+    ].map(p => MEDIA_BASE + '/' + p);
+
     // Split each into two rows (8 + 7)
     const half_tp = Math.ceil(videos_tp.length / 2);
     const videos_tp_r1 = videos_tp.slice(0, half_tp);
@@ -686,12 +732,20 @@
     const videos_fp_r1 = videos_fp.slice(0, half_fp);
     const videos_fp_r2 = videos_fp.slice(half_fp);
 
+    const half_col = Math.ceil(videos_collision.length / 2);
+    const videos_collision_r1 = videos_collision.slice(0, half_col);
+    const videos_collision_r2 = videos_collision.slice(half_col);
+
     function initVideoWall() {
       const sections = [
         { containerId: 'videoContainer_fp_r1', videos: videos_fp_r1 },
         { containerId: 'videoContainer_fp_r2', videos: videos_fp_r2 },
         { containerId: 'videoContainer_tp_r1', videos: videos_tp_r1 },
-        { containerId: 'videoContainer_tp_r2', videos: videos_tp_r2 }
+        { containerId: 'videoContainer_tp_r2', videos: videos_tp_r2 },
+        { containerId: 'videoContainer_mem', videos: videos_mem },
+        { containerId: 'videoContainer_prompt', videos: videos_prompt },
+        { containerId: 'videoContainer_collision_r1', videos: videos_collision_r1 },
+        { containerId: 'videoContainer_collision_r2', videos: videos_collision_r2 }
       ];
 
       sections.forEach(section => {
