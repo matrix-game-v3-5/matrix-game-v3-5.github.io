@@ -336,13 +336,13 @@
       </p>
 
       <div class="actions">
-        <a href="https://github.com/SkyworkAI/Matrix-Game/blob/main/Matrix-Game-3/assets/pdf/report.pdf" class="btn">
+        <a href="https://github.com/Riemann-Dynamics/Matrix-Game-3.5/blob/main/assets/Matrix_Game_3_5.pdf" class="btn">
           <i class="ai ai-arxiv"></i><span>Technical Report</span>
         </a>
-        <a href="https://github.com/SkyworkAI/Matrix-Game/tree/main/Matrix-Game-3" class="btn ghost">
+        <a href="https://github.com/Riemann-Dynamics/Matrix-Game-3.5" class="btn ghost">
           <i class="fab fa-github"></i><span>GitHub</span>
         </a>
-        <a href="https://huggingface.co/Skywork/Matrix-Game-3.0" class="btn ghost">
+        <a href="https://huggingface.co/RiemannDynamics/Matrix-Game-3.5-Base" class="btn ghost">
           <span>🤗</span><span>HuggingFace</span>
         </a>
       </div>
@@ -356,22 +356,31 @@
       <h2 class="section-title">Abstract</h2>
       <div class="prose">
         <p>
-          <strong>Matrix-Game 3.5</strong> extends Matrix-Game 3.0 toward geometry-aware, long-horizon interactive world
-          generation. The model organizes anchor frames, clean context frames, retrieved memory patches,
-          dynamic-subject references, and noisy target frames into a single <strong>pose-aware token sequence</strong>,
-          so camera control and memory conditioning are handled by the same self-attention stack. For camera control, we
-          adapt <strong>PRoPE</strong> to video generation by overlaying world-to-image projection geometry onto the
-          existing spatiotemporal RoPE channels, adding no learnable parameters while preserving RoPE's relative temporal
-          structure. For long-term scene memory, <strong>Mosaic Memory</strong> replaces frame-level recall with
-          patch-level memory: historical latent patches are lifted into metric 3D, reprojected to target views, selected
-          with visibility-aware fusion, and injected as target-aligned spatial conditioning. The memory system further
-          separates static scene recall from dynamic-subject consistency through a motion-aware object filter, static
-          Mosaic Memory, compact reference tokens, context masking, and an auxiliary subject loss. To provide the
-          required supervision, we build an offline annotation and curation pipeline that estimates metric depth, camera
-          poses, and intrinsics; generates window-level prompts for static scenes and dynamic objects; extracts object
-          tracks and reference images; and filters clips with multi-metric scene-quality criteria. Together, these
-          components enable long-horizon camera-controllable generation that recalls stable scene structure while
-          preserving prompt-driven dynamic content.
+          Interactive world models extend video generation from offline clip synthesis toward persistent simulation of
+          interactive virtual worlds, enabling applications in games, robotics, embodied agents, and XR. Achieving stable
+          long-horizon interactive generation, however, remains challenging, as the model must simultaneously preserve
+          scene geometry, dynamic consistency, and camera control while supporting real-time autoregressive generation.
+        </p>
+        <p>
+          Building upon Matrix-Game 3.0, we present <strong>Matrix-Game 3.5</strong>, which advances real-time
+          interactive world generation toward geometry-aware and long-horizon consistent simulation through three key
+          improvements. <strong>First</strong>, we propose a unified parameter-free geometry-aware memory framework that
+          integrates <strong>Patch Memory</strong> and <strong>Warped PRoPE</strong>. Patch Memory lifts historical
+          observations into 3D patch representations for geometry-aware retrieval, while Warped PRoPE injects camera
+          projection geometry into spatiotemporal rotary position embeddings, unifying long-term memory and camera
+          control without modifying the backbone architecture. <strong>Second</strong>, we introduce a disentangled
+          world representation that separately models static scene geometry and dynamic subjects through static Patch
+          Memory and lightweight multi-view <strong>Reference Tokens</strong>, jointly preserving geometric consistency
+          and subject identity throughout long-horizon generation. <strong>Third</strong>, we develop a long-horizon
+          real-time distillation framework that progressively transfers a bidirectional diffusion model into a few-step
+          causal generator through <strong>Flow Matching</strong> and curriculum-based <strong>Self-Rollout DMD</strong>,
+          enabling minute-long real-time interactive generation.
+        </p>
+        <p>
+          Extensive experiments demonstrate that, with a unified training corpus spanning Unreal simulation environments,
+          open-world games, and Internet videos, Matrix-Game 3.5 achieves strong performance in long-horizon scene
+          recall, precise camera control, subject consistency, prompt-driven world generation, and stable real-time
+          open-world interaction.
         </p>
       </div>
 
