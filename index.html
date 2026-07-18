@@ -336,7 +336,7 @@
       </p>
 
       <div class="actions">
-        <a href="https://github.com/Riemann-Dynamics/Matrix-Game-3.5/blob/main/assets/Matrix_Game_3_5.pdf" class="btn">
+        <a href="paper/Matrix-Game-3.5.pdf" class="btn">
           <i class="ai ai-arxiv"></i><span>Technical Report</span>
         </a>
         <a href="https://github.com/Riemann-Dynamics/Matrix-Game-3.5" class="btn ghost">
@@ -466,27 +466,29 @@
       </div>
 
       <div class="method-card">
-        <h3><span class="num">03</span>Few-Step Distillation</h3>
+        <h3><span class="num">03</span>Progressive Distillation</h3>
         <div class="prose" style="margin-bottom: .25rem;">
           <p>
             To turn the bidirectional video DiT into a real-time interactive world model, we reformulate generation as
-            <strong>chunk-wise autoregressive causal generation</strong>: each chunk attends only to past chunks through
-            a causal mask and to the mosaic memory available before it, preventing future-information leakage.
+            chunk-wise causal denoising and distill it in <strong>two stages</strong>. <strong>Causal adaptation</strong>
+            first uses teacher-forced <strong>Perceptual Flow Matching</strong> — constraining the flow objective in a
+            frozen perceptual feature space rather than regressing velocity in the VAE latent — to obtain a high-quality
+            few-step causal initializer.
           </p>
           <p>
-            We adopt a three-stage pipeline — <strong>causal adaptation</strong>, <strong>consistency
-            distillation</strong>, and <strong>joint distillation</strong>. The first two stages use ground-truth history
-            under teacher forcing to adapt the base model to causal attention and compress it into a few-step generator;
-            joint distillation then combines a Distribution Matching Distillation (DMD) objective on autoregressive
-            rollouts with the consistency objective, yielding stable few-step generation over long horizons.
+            <strong>Self-Rollout DMD</strong> then removes teacher forcing and applies Distribution Matching Distillation
+            on the student's own autoregressive trajectory, with patch memory and context retrieved online from the
+            causally visible history. A <strong>condition curriculum</strong> progressively distills classifier-free
+            guidance, camera control, and finally memory-conditioned generation, sharing only stable external conditions
+            (initial memory, anchor, prompt, trajectory) between student and scorers.
           </p>
         </div>
         <figure>
-          <img src="static/imgs/mg35/fig5_distill.jpg" alt="Few-step distillation pipeline">
-          <figcaption><strong>Figure 4:</strong> The distillation pipeline. We adapt the bidirectional base model to
-            causal attention under teacher forcing, compress it into a few-step generator via consistency distillation,
-            and finally combine distribution matching with consistency for joint distillation under autoregressive
-            student rollouts.</figcaption>
+          <img src="static/imgs/mg35/fig5_distill.jpg" alt="Progressive distillation pipeline">
+          <figcaption><strong>Figure 4:</strong> The two-stage progressive distillation pipeline. Causal adaptation uses
+            teacher-forced perceptual flow matching to obtain a high-quality few-step causal initializer; self-rollout
+            DMD then directly optimizes the inference-time autoregression through a curriculum that progressively
+            distills classifier-free guidance, camera control, and memory-conditioned generation.</figcaption>
         </figure>
       </div>
     </div>
@@ -555,8 +557,17 @@
   <!-- ── ACK + CITATION ── -->
   <section id="citation" class="alt">
     <div class="wrap ack">
-      <h2 class="section-title" style="text-align:left;">Acknowledgement</h2>
+      <h2 class="section-title" style="text-align:left;">Related Links</h2>
       <div class="prose">
+        <p><strong>Matrix-Game Series</strong></p>
+        <ul>
+          <li><a href="https://matrix-game-v3.github.io/">Matrix-Game 3.0</a> — Real-time and streaming interactive
+            world model with long-horizon memory</li>
+          <li><a href="https://matrix-game-v2.github.io/">Matrix-Game 2.0</a> — Real-time, streaming interactive
+            world model</li>
+        </ul>
+
+        <p style="margin-top: 1.4rem;"><strong>Acknowledgements</strong></p>
         <p>We would like to express our gratitude to:</p>
         <ul>
           <li><a href="https://github.com/huggingface/diffusers">Diffusers</a> for their excellent diffusion model
@@ -579,11 +590,12 @@
           <i class="fas fa-copy"></i><span>Copy</span>
         </button>
       </div>
-      <pre class="cite"><code id="citation-content">@article{xxx2026matrix,
+      <pre class="cite"><code id="citation-content">@misc{2026matrixgame35,
   title={Matrix-Game 3.5: Enhancing Real-Time Streaming Interactive World Models with Patch Memory},
-  author={XXX},
-  journal={arXiv preprint arXiv:2604.08995},
-  year={2026}
+  author={{Riemann Dynamics}},
+  year={2026},
+  howpublished={Project page},
+  url={https://matrix-game-v3-5.github.io/}
 }</code></pre>
     </div>
   </section>
